@@ -1,6 +1,6 @@
 /* eslint-disable solid/reactivity */
 import Lottie, { LottiePlayer } from "lottie-web";
-import { Accessor, ParentProps, Setter, createContext, createEffect, createMemo, createSignal, createUniqueId, mergeProps, useContext } from "solid-js";
+import { Accessor, ParentProps, Setter, createContext, createEffect, createMemo, createSignal, createUniqueId, mergeProps, onMount, useContext } from "solid-js";
 import { BaseLottieProps, LottieQuality, LottieRenderer } from "../typings/lottie";
 import { defaultLottieOptions } from "../defaults";
 import { handleAnimationsWithName } from "../utils/lottie";
@@ -57,7 +57,6 @@ export function LottieProvider(props: SolidLottieProviderProps) {
 
 	const uniqueIdentifier = createUniqueId();
 	const mergedProps = mergeProps(defaultLottieOptions, props);
-	const player = Lottie;
 
 	const [animations, setAnimation] = createSignal<string[]>([]);
 	const [autoplay, setAutoplay] = createSignal(mergedProps.autoplay);
@@ -75,24 +74,24 @@ export function LottieProvider(props: SolidLottieProviderProps) {
 	});
 
 	const play: LottiePlayer['play'] = (name) => {
-		handleAnimationsWithName(name, animations(), player.play);
+		handleAnimationsWithName(name, animations(), Lottie.play);
 	};
 
 	const pause: LottiePlayer['pause'] = (name) => {
-		handleAnimationsWithName(name, animations(), player.pause);
+		handleAnimationsWithName(name, animations(), Lottie.pause);
 	};
 
 	const stop: LottiePlayer['stop'] = (name) => {
-		handleAnimationsWithName(name, animations(), player.stop);
+		handleAnimationsWithName(name, animations(), Lottie.stop);
 	};
 
 	const destroy: LottiePlayer['destroy'] = (name) => {
-		handleAnimationsWithName(name, animations(), player.destroy);
+		handleAnimationsWithName(name, animations(), Lottie.destroy);
 	};
 
 	const providerValues = createMemo(() => ({
 		uniqueIdentifier,
-		player: player,
+		player: Lottie,
 		setLoop,
 		setRenderer,
 		setAutoplay,
