@@ -3,15 +3,30 @@ export {
 	useLottie 
 } from "./context/LottieProvider";
 
+export {
+	LottieComponent
+} from "./components/Lottie";
+
+export { 
+	useLottieControl
+} from "./primitives/useLottieControl";
+
+export {
+	defaultLottieOptions,
+	setLottieDefaultOptions
+} from "./defaults";
+
 // Export types
 export type {
-	SolidLottieContext,
-	SolidLottieProviderProps,
-	SolidLottieStore
+	SolidLottieContext
 } from "./context/LottieProvider";
 
 export type {
-	BaseLottieProps,
+	BaseLottieOptions,
 	LottieQuality,
 	LottieRenderer
 } from "./typings/lottie";
+
+export type { 
+	LottieProps
+} from "./components/Lottie";

@@ -1,9 +1,8 @@
-export interface BaseLottieProps {
+export interface BaseLottieOptions {
 	renderer?: LottieRenderer;
 	loop?: boolean;
 	autoplay?: boolean;
 	speed?: number;
-	quality?: LottieQuality;
 }
 
 export type LottieQuality = "high" | "medium" | "low";

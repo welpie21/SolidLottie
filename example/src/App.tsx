@@ -12,13 +12,13 @@ function Control() {
 
 	return (
 		<div style={{ display: "flex", gap: "1rem" }}>
-			<button onClick={() => lottie.play('animation')}>
+			<button onClick={lottie.playAll}>
 				play
 			</button>
-			<button onClick={() => lottie.pause('animation')}>
+			<button onClick={lottie.pauseAll}>
 				pause
 			</button>
-			<button onClick={() => lottie.stop('animation')}>
+			<button onClick={lottie.stopAll}>
 				stop
 			</button>
 		</div>
@@ -27,20 +27,40 @@ function Control() {
 
 function Container() {
 
+	const lottie = useLottie();
+	const [loop, setLoop] = createSignal(true);
+
 	return (
 		<>
+			<p>Speed: {lottie.speed()}</p>
+			<input 
+				type="range" 
+				min={0} max={10} 
+				value={lottie.speed()} 
+				onChange={(e) => lottie.setSpeed(e.target.valueAsNumber)}
+			/>
+
+			<input
+				type="checkbox"
+				checked={loop()}
+				onChange={(event) => {
+					setLoop(event.target.checked);
+					lottie.setLoop(event.target.checked);
+				}}
+			/>
+
 			<LottieComponent
-				lottie-data={LottieJSONB}
+				animation-data={LottieJSONB}
 				name='animation'
 				style={{ width: "100px", height: "100px" }}
 			/>
 			<LottieComponent
-				lottie-data={LottieJSONA}
+				animation-data={LottieJSONA}
 				name='open'
 				style={{ width: "100px", height: "100px" }}
 			/>
 			<LottieComponent
-				lottie-data={LottieJSONA}
+				animation-data={LottieJSONA}
 				name='animation'
 				style={{ width: "100px", height: "100px" }}
 			/>
@@ -51,22 +71,12 @@ function Container() {
 
 function App() {
 
-	const [speedA, setSpeedA] = createSignal(1);
-	const [speedB, setSpeedB] = createSignal(1);
-
 	return (
 		<>
-			<p>Speed: {speedA()}</p>
-			<input type="range" min={1} max={10} value={speedA()} onChange={(e) => setSpeedA(e.target.valueAsNumber)} />
-			
-			<p>Speed: {speedB()}</p>
-			<input type="range" min={1} max={10} value={speedB()} onChange={(e) => setSpeedB(e.target.valueAsNumber)} />
-			
-			<LottieProvider speed={speedA()}>
+			<LottieProvider speed={7}>
 				<Container />
 			</LottieProvider>
-			
-			<LottieProvider speed={speedB()}>
+			<LottieProvider>
 				<Container />
 			</LottieProvider>
 		</>

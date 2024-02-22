@@ -1,9 +1,11 @@
 /* eslint-disable solid/reactivity */
-import Lottie, { LottiePlayer } from "lottie-web";
-import { Accessor, ParentProps, Setter, createContext, createEffect, createMemo, createSignal, createUniqueId, mergeProps, onMount, useContext } from "solid-js";
-import { BaseLottieProps, LottieQuality, LottieRenderer } from "../typings/lottie";
+import Lottie, { AnimationItem, LottiePlayer } from "lottie-web";
+import { Accessor, ParentProps, Setter, createContext, createMemo, createSignal, mergeProps, splitProps, useContext } from "solid-js";
+import { BaseLottieOptions, LottieRenderer } from "../typings/lottie";
 import { defaultLottieOptions } from "../defaults";
-import { handleAnimationsWithName } from "../utils/lottie";
+import { assignAnimationValue, handleAnimation, handleAnimations, parseDirection } from "../utils/lottie";
+import { EmptyFunction } from "../typings/global";
+import { useLottieControl } from "../primitives/useLottieControl";
 
 export interface SolidLottieContext {
 
@@ -11,8 +13,8 @@ export interface SolidLottieContext {
 	// ========================= Initializers ========================
 	// ===============================================================
 
-	registerAnimation: Setter<string[]>;
-
+	registerAnimation: (item: AnimationItem) => void;
+	unRegisterAnimation: (id: string) => void;
 
 	// ===============================================================
 	// ======================= Control Methods =======================
@@ -21,97 +23,147 @@ export interface SolidLottieContext {
 	setLoop: Setter<boolean>;
 	setRenderer: Setter<LottieRenderer>;
 	setAutoplay: Setter<boolean>;
-	setSpeed: Setter<number>;
-	setQuality: Setter<LottieQuality>;
 
-	play: LottiePlayer['play'];
-	pause: LottiePlayer['pause'];
-	stop: LottiePlayer['stop'];
-	destroy: LottiePlayer['destroy'];
+	setSpeed: Setter<number>;
+	setSpeedAll: (speed: number) => void;
+
+	// invdividual control methods
+	setAnimationSpeed: (id: string, speed: number) => void;
+	setAnimationLoop: (id: string, loop: boolean) => void;
+	setAnimationRenderer: (id: string, renderer: LottieRenderer) => void;
+	setAnimationSegment: (range: [number, number], id: string) => void;
+	playAnimationSegment: (range: [number, number], id: string) => void;
+	playAnimationDirection: (direction: "forward" | "reverse", id: string) => void;
+	goToAndPlay: (value: number, isFrame: boolean, id: string) => void;
+
+	// context control methods
+	playAll: EmptyFunction;
+	pauseAll: EmptyFunction;
+	stopAll: EmptyFunction;
+	destroyAll: EmptyFunction;
 
 	// ===============================================================
 	// =========================== Properties ========================
 	// ===============================================================
 
-	uniqueIdentifier: string;
 	player: LottiePlayer;
 
 	speed: Accessor<number>;
 	loop: Accessor<boolean>;
 	autoplay: Accessor<boolean>;
 	renderer: Accessor<LottieRenderer>;
-	quality: Accessor<LottieQuality>;
-}
-
-export interface SolidLottieProviderProps extends ParentProps, BaseLottieProps {
-
-}
-
-export interface SolidLottieStore extends Required<BaseLottieProps> {
-	player: LottiePlayer | null;
 }
 
 const LottieContext = createContext<SolidLottieContext>();
 
-export function LottieProvider(props: SolidLottieProviderProps) {
+export function LottieProvider(props: ParentProps<BaseLottieOptions>) {
 
-	const uniqueIdentifier = createUniqueId();
-	const mergedProps = mergeProps(defaultLottieOptions, props);
+	const [root, other] = splitProps(props, ["autoplay", "renderer", "loop", "speed"]);
+	const mergedProps = mergeProps(defaultLottieOptions, root);
 
-	const [animations, setAnimation] = createSignal<string[]>([]);
-	const [autoplay, setAutoplay] = createSignal(mergedProps.autoplay);
-	const [renderer, setRenderer] = createSignal(mergedProps.renderer);
-	const [loop, setLoop] = createSignal(mergedProps.loop);
-	const [speed, setSpeed] = createSignal(mergedProps.speed);
-	const [quality, setQuality] = createSignal(mergedProps.quality);
+	const [animations, setAnimations] = createSignal<AnimationItem[]>([]);
+	const controller = useLottieControl(mergedProps);
 
-	createEffect(() => {
-		setAutoplay(mergedProps.autoplay);
-		setRenderer(mergedProps.renderer);
-		setLoop(mergedProps.loop);
-		setSpeed(mergedProps.speed);
-		setQuality(mergedProps.quality);
+	const playAll: LottiePlayer['play'] = () => {
+		const childrens = animations();
+		handleAnimations(childrens, 'play');
+	};
+
+	const pauseAll: LottiePlayer['pause'] = () => {
+		const childrens = animations();
+		handleAnimations(childrens, 'pause');
+	};
+
+	const stopAll: LottiePlayer['stop'] = () => {
+		const childrens = animations();
+		handleAnimations(childrens, 'stop');
+	};
+
+	const destroyAll: LottiePlayer['destroy'] = () => {
+		const childrens = animations();
+		handleAnimations(childrens, 'destroy');
+	};
+
+	const setSpeedAll = (speed: number) => {
+		const childrens = animations();
+		handleAnimations(childrens, 'setSpeed', speed);
+	};
+
+	const registerAnimation = (item: AnimationItem) => {
+		setAnimations((animations) => {
+			animations.push(item);
+			return animations;
+		});
+	};
+
+	const setAnimationSpeed = (id: string, speed: number) => {
+		const childrens = animations();
+		handleAnimation(childrens, id, 'setSpeed', speed);
+	};
+
+	const setAnimationLoop = (id: string, loop: boolean) => {
+		const childrens = animations();
+		handleAnimation(childrens, id, 'setLoop', loop);
+	};
+
+	const setAnimationRenderer = (id: string, renderer: LottieRenderer) => {
+		const childrens = animations();
+		assignAnimationValue(childrens, id, 'renderer', renderer);
+	};
+
+	const setAnimationSegment = (range: [number, number], id: string) => {
+		const childrens = animations();
+		handleAnimation(childrens, id, 'setSegment', range);
+	};
+
+	const playAnimationSegment = (range: [number, number], id: string) => {
+		const childrens = animations();
+		handleAnimation(childrens, id, 'playSegments', range);
+	};
+
+	const playAnimationDirection = (direction: "forward" | "reverse", id: string) => {
+		const childrens = animations();
+		handleAnimation(childrens, id, 'setDirection', parseDirection(direction));
+	};
+
+	const goToAndPlay = (value: number, isFrame: boolean, id: string) => {
+		const childrens = animations();
+		handleAnimation(childrens, id, 'goToAndPlay', value, isFrame);
+	};
+
+	const unRegisterAnimation = (id: string) => {
+		setAnimations((prev) => prev.filter((item) => item.animationID !== id));
+	};
+
+	const providerValues = createMemo<SolidLottieContext>(() => {
+
+		const base = {
+			player: Lottie,
+			playAll,
+			pauseAll,
+			stopAll,
+			destroyAll,
+			registerAnimation,
+			setSpeedAll,
+			unRegisterAnimation,
+			setAnimationSpeed,
+			setAnimationLoop,
+			setAnimationRenderer,
+			setAnimationSegment,
+			playAnimationSegment,
+			playAnimationDirection,
+			goToAndPlay,
+		} satisfies Partial<SolidLottieContext>;
+
+		return Object.assign(
+			base,
+			controller()
+		);
 	});
-
-	const play: LottiePlayer['play'] = (name) => {
-		handleAnimationsWithName(name, animations(), Lottie.play);
-	};
-
-	const pause: LottiePlayer['pause'] = (name) => {
-		handleAnimationsWithName(name, animations(), Lottie.pause);
-	};
-
-	const stop: LottiePlayer['stop'] = (name) => {
-		handleAnimationsWithName(name, animations(), Lottie.stop);
-	};
-
-	const destroy: LottiePlayer['destroy'] = (name) => {
-		handleAnimationsWithName(name, animations(), Lottie.destroy);
-	};
-
-	const providerValues = createMemo(() => ({
-		uniqueIdentifier,
-		player: Lottie,
-		setLoop,
-		setRenderer,
-		setAutoplay,
-		setSpeed,
-		setQuality,
-		play,
-		pause,
-		stop,
-		destroy,
-		speed,
-		loop,
-		autoplay,
-		renderer,
-		quality,
-		registerAnimation: setAnimation
-	}));
 
 	return (
 		<LottieContext.Provider value={providerValues()}>
-			{props.children}
+			{other.children}
 		</LottieContext.Provider>
 	);
 }

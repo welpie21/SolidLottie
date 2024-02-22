@@ -1,76 +1,77 @@
 import { JSX } from "solid-js/jsx-runtime";
 import { useLottie } from "..";
-import { BaseLottieProps } from "../typings/lottie";
+import { BaseLottieOptions } from "../typings/lottie";
 import { clsx } from "../utils/helpers";
-import { createEffect, createUniqueId, splitProps } from "solid-js";
-import { getAnimationName, unRegisterAnimation } from "../utils/lottie";
+import { createEffect, createSignal, onMount, splitProps } from "solid-js";
 
 export interface LottieProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	name: string;
-	"lottie-data": string;
-	options?: BaseLottieProps;
+	"animation-data": string;
+	options?: BaseLottieOptions;
+	initialSegment?: [number, number];
 }
+
+const lottieSplitProps = [
+	"name", 
+	"animation-data", 
+	"options", 
+	"class",
+	"initialSegment"
+] as const;
 
 export function LottieComponent(props: LottieProps) {
 
 	let ref: HTMLDivElement | undefined;
-	const [root, other] = splitProps(props, ["name", "lottie-data", "options", "class"]);
+	const [root, other] = splitProps(props, lottieSplitProps);
 
 	const lottie = useLottie();
-	const uniqueIdentifier = createUniqueId();
+	const [animationId, setAnimationId] = createSignal<string>();
 
-	const animationName = () => getAnimationName(
-		lottie.uniqueIdentifier,
-		uniqueIdentifier,
-		root.name
-	);
-
-	const unmountLottieComponent = () => {
-		const name = animationName();
-		const unregister = unRegisterAnimation(name);
-
-		lottie.registerAnimation(unregister);
-		lottie.destroy(animationName());
-	};
-
-	createEffect(() => {
-		const name = animationName();
-		const speed = props.options?.speed ?? lottie.speed();
-
-		lottie.player.setSpeed(speed, name);
-	});
-
-	createEffect(() => {
-
-		const name = animationName();
+	onMount(() => {
 
 		if (!ref) {
 			console.warn("Component is not mounted yet - ", props.name);
 			return;
 		}
 
-		lottie.registerAnimation(prev => {
-			prev.push(name);
-			return prev;
-		});
-
-		lottie.player.loadAnimation({
+		const { autoplay, loop, renderer } = Object.assign(
+			{ renderer: lottie.renderer(), loop: lottie.loop(), autoplay: lottie.autoplay() },
+			{ renderer: root.options?.renderer, loop: root.options?.loop, autoplay: root.options?.autoplay}
+		);
+		
+		const animation = lottie.player.loadAnimation({
 			container: ref,
-			animationData: JSON.parse(root["lottie-data"]),
-			renderer: root.options?.renderer,
-			loop: root.options?.loop,
-			autoplay: root.options?.autoplay,
-			name: name
+			animationData: JSON.parse(root["animation-data"]),
+			initialSegment: root.initialSegment,
+			loop,
+			renderer,
+			autoplay
 		});
 
-		return unmountLottieComponent;
+		setAnimationId(animation.animationID);
+
+		lottie.registerAnimation(animation)
+	});
+
+	createEffect(() => {
+		const id = animationId()!;
+		const speed = root.options?.speed ?? lottie.speed();
+
+		lottie.setAnimationSpeed(id, speed);
+	});
+
+	createEffect(() => {
+		const id = animationId()!;
+		const loop = root.options?.loop ?? lottie.loop();
+
+		lottie.setAnimationLoop(id, loop);
 	});
 
 	return (
 		<div
 			ref={ref}
 			class={clsx("lottie", root.class)}
-			data-name={animationName()}
+			data-name={animationId()}
 			{...other}
 		/>
 	);
