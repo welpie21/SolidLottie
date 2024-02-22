@@ -12,6 +12,6 @@ export const defaultLottieOptions = {
  * This sets default values for the LottieProvider globally.
  * @param options 
  */
-export function setLottieDefaultOptions(options: Partial<typeof defaultLottieOptions>) {
+export function setLottieDefaultOptions(options: Partial<BaseLottieProps>) {
 	Object.assign(defaultLottieOptions, options);
 }
