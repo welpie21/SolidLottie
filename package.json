@@ -1,6 +1,13 @@
 {
-	"name": "solid-lottie",
+	"name": "solid-lottie.js",
 	"version": "0.0.1",
+	"description": "A SolidJS library for using Lottie animations",
+	"keywords": [
+		"solid",
+		"solidjs",
+		"lottie",
+		"animation"
+	],
 	"type": "module",
 	"main": "dist/solid-lottie.umd.cjs",
 	"module": "dist/solid-lottie.js",
