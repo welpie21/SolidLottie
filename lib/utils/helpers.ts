@@ -41,8 +41,8 @@ export function animateOnScroll(options: {
 
 	if (stickyOffset < beginning) {
 		animation.goToAndStop(0, true);
-	} else if (stickyOffset > end) {
-		animation.goToAndStop(animation.totalFrames, true);
+	} else if (stickyOffset >= end) {
+		animation.goToAndStop(animation.totalFrames - 0.1, true);
 	} else {
 		const progress = clamp(animation.totalFrames * (stickyOffset / end), beginning, end);
 		animation.goToAndStop(progress, true);
