@@ -1,5 +1,5 @@
 import LottieJSONA from "./assets/anim1.json?raw";
-import LottieJSONB from "./assets/anim2.json?raw";
+import LottieJSONB from "./assets/anim3.json?raw";
 import { LottieProvider } from "../../lib/context/LottieProvider";
 import { LottieComponent } from "../../lib/components/Lottie";
 import './App.css';
@@ -53,7 +53,7 @@ function App() {
 						ref={(el) => (ref1 = el)}
 						animation-data={LottieJSONA}
 						name='animation'
-						style={{ width: "200px", height: "400px", position: "sticky", left: "0", right: "0", top: "0" }}
+						style={{ width: "400px", height: "800px", position: "sticky", left: "0", right: "0", top: "0" }}
 						options={{ speed: 1 }}
 						onEvent={{
 							DOMLoaded: (_, __, animation) => {
@@ -62,13 +62,13 @@ function App() {
 						}}
 					/>
 				</section>
-				<section style={{ position: "relative", height: "700vh" }}>
+				<section style={{ position: "relative", height: "600vh" }}>
 					<LottieComponent
 						ref={(el) => (ref2 = el)}
 						animation-data={LottieJSONB}
 						name='animation'
 						options={{ speed: 1 }}
-						style={{ width: "200px", height: "400px", position: "sticky", left: "0", right: "0", top: "0" }}
+						style={{ width: "400px", height: "800px", position: "sticky", left: "0", right: "0", top: "0" }}
 						onEvent={{
 							DOMLoaded: (_, __, animation) => {
 								setAnimation2(animation);

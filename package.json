@@ -7,7 +7,9 @@
 		"build": "tsc && vite build",
 		"preview": "vite preview",
 		"test": "vitest",
-		"example:dev": "cd example && vite"
+		"example:dev": "cd example && vite",
+		"example:build": "cd example && vite build",
+		"example:serve": "cd example && vite preview"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.19",
