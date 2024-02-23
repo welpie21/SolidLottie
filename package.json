@@ -1,5 +1,5 @@
 {
-	"name": "@welpie21/solid-lottie",
+	"name": "solid-lottie",
 	"version": "0.0.1",
 	"type": "module",
 	"main": "dist/solid-lottie.umd.cjs",
