@@ -2,6 +2,25 @@
 	"name": "solid-lottie",
 	"version": "0.0.1",
 	"type": "module",
+	"main": "dist/solid-lottie.umd.cjs",
+	"module": "dist/solid-lottie.js",
+	"types": "dist/types/index.d.ts",
+	"typings": "dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/solid-lottie.js",
+			"browser": {
+				"import": "./dist/solid-lottie.js",
+				"require": "./dist/solid-lottie.umd.cjs"
+			},
+			"require": "./dist/solid-lottie.umd.cjs",
+			"node": "./dist/solid-lottie.umd.cjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
