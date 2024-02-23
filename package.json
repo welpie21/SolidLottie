@@ -6,7 +6,8 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"test": "vitest"
+		"test": "vitest",
+		"example:dev": "cd example && vite"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.19",

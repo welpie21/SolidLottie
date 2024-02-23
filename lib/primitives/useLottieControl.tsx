@@ -1,8 +1,8 @@
 import { createEffect, createSignal } from "solid-js";
-import { BaseLottieProps } from "..";
+import { BaseLottieOptions } from "..";
 
-export function useLottieControl(
-	options: Required<BaseLottieProps>
+export function useLottieOptions(
+	options: Required<BaseLottieOptions>
 ) {
 	const [speed, setSpeed] = createSignal(options.speed);
 	const [autoplay, setAutoplay] = createSignal(options.autoplay);

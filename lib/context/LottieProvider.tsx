@@ -5,7 +5,7 @@ import { BaseLottieOptions, LottieRenderer } from "../typings/lottie";
 import { defaultLottieOptions } from "../defaults";
 import { assignAnimationValue, handleAnimation, handleAnimations, parseDirection } from "../utils/lottie";
 import { EmptyFunction } from "../typings/global";
-import { useLottieControl } from "../primitives/useLottieControl";
+import { useLottieOptions } from "../primitives/useLottieControl";
 
 export interface SolidLottieContext {
 
@@ -62,7 +62,7 @@ export function LottieProvider(props: ParentProps<BaseLottieOptions>) {
 	const mergedProps = mergeProps(defaultLottieOptions, root);
 
 	const [animations, setAnimations] = createSignal<AnimationItem[]>([]);
-	const controller = useLottieControl(mergedProps);
+	const options = useLottieOptions(mergedProps);
 
 	const playAll: LottiePlayer['play'] = () => {
 		const childrens = animations();
@@ -157,7 +157,7 @@ export function LottieProvider(props: ParentProps<BaseLottieOptions>) {
 
 		return Object.assign(
 			base,
-			controller()
+			options()
 		);
 	});
 

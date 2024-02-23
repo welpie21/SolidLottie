@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AnimationItem } from "lottie-web";
+import type { AnimationItem } from "lottie-web";
 
 export function handleAnimations(
 	animations: AnimationItem[],
