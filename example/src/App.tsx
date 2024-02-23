@@ -14,7 +14,7 @@ function App() {
 
 	const [animation1, setAnimation1] = createSignal<AnimationItem>();
 	const [animation2, setAnimation2] = createSignal<AnimationItem>();
- 
+
 	const handler = (_: Event | MouseEvent) => {
 		const anim1 = animation1()!;
 		const anim2 = animation2()!;
@@ -28,7 +28,7 @@ function App() {
 		animateOnScroll({
 			animation: anim2,
 			animationElement: ref2,
-			parentElement: ref2.parentElement!
+			parentElement: ref2.parentElement!.parentElement!
 		});
 	};
 
@@ -63,18 +63,35 @@ function App() {
 					/>
 				</section>
 				<section style={{ position: "relative", height: "600vh" }}>
-					<LottieComponent
-						ref={(el) => (ref2 = el)}
-						animation-data={LottieJSONB}
-						name='animation'
-						options={{ speed: 1 }}
-						style={{ width: "400px", height: "800px", position: "sticky", left: "0", right: "0", top: "0" }}
-						onEvent={{
-							DOMLoaded: (_, __, animation) => {
-								setAnimation2(animation);
-							}
+					<div
+						style={{
+							position: "sticky",
+							top: "-10vh",
+							left: 0, right: 0,
+							"z-index": 1,
+							height: "100vh",
+							"background-image": "url('https://www.lego.com/cdn/cs/set/assets/blt2cfbd89252faf547/Z2_Benny.jpg')",
+							"background-repeat": "no-repeat",
+							"background-size": "contain",
+							"background-position-y": "center",
+							display: "flex",
+							"justify-content": "center",
+							"align-items": "center"
 						}}
-					/>
+					>
+						<LottieComponent
+							ref={(el) => (ref2 = el)}
+							animation-data={LottieJSONB}
+							name='animation'
+							options={{ speed: 1 }}
+							style={{ width: "400px", height: "800px" }}
+							onEvent={{
+								DOMLoaded: (_, __, animation) => {
+									setAnimation2(animation);
+								}
+							}}
+						/>
+					</div>
 				</section>
 			</div>
 		</LottieProvider>
