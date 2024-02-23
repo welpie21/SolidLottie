@@ -11,8 +11,17 @@ export function useLottieOptions(
 
 	createEffect(() => {
 		setSpeed(options.speed);
+	});
+
+	createEffect(() => {
 		setAutoplay(options.autoplay);
+	});
+
+	createEffect(() => {
 		setLoop(options.loop);
+	});
+
+	createEffect(() => {
 		setRenderer(options.renderer);
 	});
 
